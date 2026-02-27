@@ -1,0 +1,30 @@
+# systemd service file for the Celery worker.
+#
+# Processes background tasks such as notification delivery.
+# Place at: /etc/systemd/system/celery.service
+#
+# Commands:
+#   sudo systemctl start celery
+#   sudo systemctl enable celery
+#   sudo systemctl status celery
+
+[Unit]
+Description=Celery worker for eLearning background tasks
+After=network.target redis.service
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/elearning
+EnvironmentFile=/home/ubuntu/elearning/.env
+ExecStart=/home/ubuntu/elearning/venv/bin/celery \
+    -A elearning \
+    worker \
+    --loglevel=info \
+    --logfile=/var/log/celery/worker.log
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

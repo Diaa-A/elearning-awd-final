@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Students - {{ course.code }} - eLearning{% endblock %}
+
+{% block content %}
+<h3>Students in {{ course.code }} - {{ course.title }}</h3>
+<a href="{% url 'course-detail' pk=course.pk %}" class="btn btn-outline-secondary btn-sm mb-3">Back to Course</a>
+
+{% if enrollments %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Enrolled</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for enrollment in enrollments %}
+        <tr>
+            <td><a href="{% url 'profile-detail' pk=enrollment.student.pk %}">{{ enrollment.student.username }}</a></td>
+            <td>{{ enrollment.student.get_full_name }}</td>
+            <td>{{ enrollment.student.email }}</td>
+            <td>
+                <span class="badge bg-{% if enrollment.status == 'active' %}success{% elif enrollment.status == 'blocked' %}danger{% else %}secondary{% endif %}">
+                    {{ enrollment.get_status_display }}
+                </span>
+            </td>
+            <td>{{ enrollment.enrolled_at|date:"M d, Y" }}</td>
+            <td>
+                {% if enrollment.status == 'active' %}
+                <form method="post" action="{% url 'block-student' pk=course.pk student_id=enrollment.student.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                </form>
+                <form method="post" action="{% url 'remove-student' pk=course.pk student_id=enrollment.student.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning btn-sm">Remove</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No students enrolled in this course.</p>
+{% endif %}
+{% endblock %}

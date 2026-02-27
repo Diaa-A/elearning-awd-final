@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Search Users - eLearning{% endblock %}
+
+{% block content %}
+<h3>Search Users</h3>
+
+<!-- Search form -->
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-6">
+        <input type="text" name="q" class="form-control" placeholder="Search by name, username, or email..." value="{{ query }}">
+    </div>
+    <div class="col-md-3">
+        <select name="role" class="form-select">
+            <option value="">All Roles</option>
+            <option value="student" {% if role_filter == "student" %}selected{% endif %}>Students</option>
+            <option value="teacher" {% if role_filter == "teacher" %}selected{% endif %}>Teachers</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+
+<!-- Search results -->
+{% if query %}
+    {% if results %}
+    <p class="text-muted">Found {{ results|length }} result{{ results|length|pluralize }}.</p>
+    <div class="list-group">
+        {% for u in results %}
+        <a href="{% url 'profile-detail' pk=u.pk %}" class="list-group-item list-group-item-action">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0">{{ u.get_full_name|default:u.username }}</h6>
+                    <small class="text-muted">{{ u.email }}</small>
+                </div>
+                <span class="badge bg-{% if u.is_teacher %}primary{% else %}success{% endif %}">{{ u.get_role_display }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No users found matching "{{ query }}".</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

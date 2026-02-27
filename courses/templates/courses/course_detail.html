@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.code }} - {{ course.title }} - eLearning{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Course information -->
+    <div class="col-md-8">
+        <h3>{{ course.code }} - {{ course.title }}</h3>
+        <p class="text-muted">
+            Teacher: <a href="{% url 'profile-detail' pk=course.teacher.pk %}">{{ course.teacher.get_full_name|default:course.teacher.username }}</a>
+            {% if course.category %} | Category: {{ course.category }}{% endif %}
+            | {{ course.enrolled_count }}/{{ course.max_students }} students
+        </p>
+        <p>{{ course.description }}</p>
+
+        <!-- Teacher action buttons -->
+        {% if is_teacher %}
+        <div class="mb-4">
+            <a href="{% url 'course-edit' pk=course.pk %}" class="btn btn-outline-primary btn-sm">Edit Course</a>
+            <a href="{% url 'material-upload' pk=course.pk %}" class="btn btn-outline-success btn-sm">Upload Material</a>
+            <a href="{% url 'course-students' pk=course.pk %}" class="btn btn-outline-info btn-sm">View Students</a>
+            <a href="{% url 'chat-course' course_id=course.pk %}" class="btn btn-outline-dark btn-sm">Course Chat</a>
+        </div>
+        {% endif %}
+
+        <!-- Student action buttons -->
+        {% if user.is_student %}
+        <div class="mb-4">
+            {% if is_enrolled %}
+            <form method="post" action="{% url 'course-unenroll' pk=course.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">Unenrol</button>
+            </form>
+            <a href="{% url 'chat-course' course_id=course.pk %}" class="btn btn-outline-dark btn-sm">Course Chat</a>
+            {% if not has_feedback %}
+            <a href="{% url 'feedback-create' pk=course.pk %}" class="btn btn-outline-warning btn-sm">Leave Feedback</a>
+            {% endif %}
+            {% else %}
+            {% if enrollment and enrollment.status == 'blocked' %}
+            <span class="badge bg-danger">You are blocked from this course</span>
+            {% else %}
+            <form method="post" action="{% url 'course-enroll' pk=course.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-sm">Enrol in this Course</button>
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Course Materials -->
+        <h4 class="mt-4">Course Materials</h4>
+        {% if materials %}
+        <div class="list-group mb-4">
+            {% for material in materials %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">{{ material.title }}</h6>
+                        <small class="text-muted">
+                            {{ material.get_material_type_display }} |
+                            Uploaded {{ material.uploaded_at|timesince }} ago
+                        </small>
+                        {% if material.description %}
+                        <p class="mb-0 mt-1"><small>{{ material.description }}</small></p>
+                        {% endif %}
+                    </div>
+                    {% if is_enrolled or is_teacher %}
+                    <a href="{{ material.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">Download</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No materials uploaded yet.</p>
+        {% endif %}
+
+        <!-- Feedback section -->
+        <h4 class="mt-4">Student Feedback</h4>
+        {% if feedbacks %}
+        {% for fb in feedbacks %}
+        <div class="card mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ fb.student.get_full_name|default:fb.student.username }}</strong>
+                    <span>
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= fb.rating %}
+                            <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="bi bi-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                <p class="mb-0 mt-1">{{ fb.comment }}</p>
+                <small class="text-muted">{{ fb.created_at|timesince }} ago</small>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted">No feedback yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Course Info</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Code:</strong> {{ course.code }}</li>
+                <li class="list-group-item"><strong>Status:</strong> {% if course.is_active %}Active{% else %}Inactive{% endif %}</li>
+                <li class="list-group-item"><strong>Capacity:</strong> {{ course.enrolled_count }}/{{ course.max_students }}</li>
+                <li class="list-group-item"><strong>Created:</strong> {{ course.created_at|date:"M d, Y" }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

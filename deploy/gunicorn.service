@@ -1,0 +1,32 @@
+# systemd service file for Gunicorn (WSGI HTTP server).
+#
+# Handles all standard HTTP requests (pages, API calls, admin).
+# Place at: /etc/systemd/system/gunicorn.service
+#
+# Commands:
+#   sudo systemctl start gunicorn
+#   sudo systemctl enable gunicorn
+#   sudo systemctl status gunicorn
+
+[Unit]
+Description=Gunicorn WSGI server for eLearning platform
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/elearning
+EnvironmentFile=/home/ubuntu/elearning/.env
+ExecStart=/home/ubuntu/elearning/venv/bin/gunicorn \
+    elearning.wsgi:application \
+    --bind 127.0.0.1:8000 \
+    --workers 3 \
+    --timeout 120 \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

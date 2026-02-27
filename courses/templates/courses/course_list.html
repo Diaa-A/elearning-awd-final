@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - eLearning{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Available Courses</h3>
+    {% if user.is_teacher %}
+    <a href="{% url 'course-create' %}" class="btn btn-primary">Create Course</a>
+    {% endif %}
+</div>
+
+<!-- Search bar -->
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search courses by title, code, or category..." value="{{ query }}">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </div>
+</form>
+
+<!-- Course cards grid -->
+{% if courses %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for course in courses %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ course.code }}</h6>
+                <p class="card-text">{{ course.description|truncatechars:120 }}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Teacher: {{ course.teacher.get_full_name|default:course.teacher.username }}<br>
+                        Enrolled: {{ course.enrolled_count }}/{{ course.max_students }}
+                        {% if course.category %}<br>Category: {{ course.category }}{% endif %}
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'course-detail' pk=course.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                {% if user.is_student %}
+                    {% if course.pk in enrolled_course_ids %}
+                    <span class="badge bg-success float-end mt-1">Enrolled</span>
+                    {% else %}
+                    <form method="post" action="{% url 'course-enroll' pk=course.pk %}" class="d-inline float-end">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Enrol</button>
+                    </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No courses available.</p>
+{% endif %}
+{% endblock %}

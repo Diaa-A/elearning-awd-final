@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - eLearning{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Notifications</h3>
+    {% if notifications %}
+    <form method="post" action="{% url 'notification-read-all' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Mark All as Read</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if notifications %}
+<div class="list-group">
+    {% for notification in notifications %}
+    <a href="{% url 'notification-read' pk=notification.pk %}"
+       class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-light fw-bold{% endif %}">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h6 class="mb-1">
+                    {% if not notification.is_read %}
+                    <span class="badge bg-primary me-1">New</span>
+                    {% endif %}
+                    {{ notification.title }}
+                </h6>
+                <p class="mb-1">{{ notification.message }}</p>
+                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+            </div>
+            <span class="badge bg-{% if notification.notification_type == 'enrollment' %}info{% elif notification.notification_type == 'new_material' %}success{% elif notification.notification_type == 'feedback' %}warning{% else %}secondary{% endif %}">
+                {{ notification.get_notification_type_display }}
+            </span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No notifications yet.</p>
+{% endif %}
+{% endblock %}

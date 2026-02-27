@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - eLearning{% endblock %}
+
+{% block content %}
+<h3>My Conversations</h3>
+
+<!-- Course group chats-->
+<h5 class="mt-4">Course Group Chats</h5>
+{% if course_rooms %}
+<div class="list-group mb-4">
+    {% for room in course_rooms %}
+    <a href="{% url 'chat-course' course_id=room.course.pk %}" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h6 class="mb-0">{{ room.course.code }} - {{ room.course.title }}</h6>
+                <small class="text-muted">Group Chat</small>
+            </div>
+            <i class="bi bi-chat-dots"></i>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No course chats available.</p>
+{% endif %}
+
+<!--Direct messages R1(f) -->
+<h5 class="mt-4">Direct Messages</h5>
+{% if dm_rooms %}
+<div class="list-group mb-4">
+    {% for room in dm_rooms %}
+    <a href="#" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h6 class="mb-0">{{ room.name }}</h6>
+                <small class="text-muted">Direct Message</small>
+            </div>
+            <i class="bi bi-chat-left-text"></i>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No direct messages yet. Visit a user's profile to start a conversations.</p>
+{% endif %}
+{% endblock %}

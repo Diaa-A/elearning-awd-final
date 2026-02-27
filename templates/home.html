@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}eLearning - Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <!-- Authenticated user dashboard -->
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+            <p class="text-muted">You are logged in as a <strong>{{ user.role }}</strong>.</p>
+
+            {% if user.is_teacher %}
+            <!-- Teacher dashboard: show taught courses -->
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                <h4>My Courses</h4>
+                <a href="{% url 'course-create' %}" class="btn btn-primary btn-sm">Create New Course</a>
+            </div>
+            {% if taught_courses %}
+            <div class="list-group">
+                {% for course in taught_courses %}
+                <a href="{% url 'course-detail' pk=course.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">{{ course.code }} - {{ course.title }}</h6>
+                            <small class="text-muted">{{ course.enrolled_count }}/{{ course.max_students }} students enrolled</small>
+                        </div>
+                        <span class="badge bg-{% if course.is_active %}success{% else %}secondary{% endif %}">
+                            {% if course.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">You have not created any courses yet.</p>
+            {% endif %}
+
+            {% else %}
+            <!-- Student dashboard: show enrolled courses -->
+            <h4 class="mt-4 mb-3">My Enrolled Courses</h4>
+            {% if enrollments %}
+            <div class="list-group">
+                {% for enrollment in enrollments %}
+                <a href="{% url 'course-detail' pk=enrollment.course.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">{{ enrollment.course.code }} - {{ enrollment.course.title }}</h6>
+                            <small class="text-muted">Teacher: {{ enrollment.course.teacher.get_full_name|default:enrollment.course.teacher.username }}</small>
+                        </div>
+                        <span class="badge bg-success">Enrolled</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">You are not enrolled in any courses yet.</p>
+            {% endif %}
+            {% endif %}
+
+            <div class="mt-3">
+                <a href="{% url 'course-list' %}" class="btn btn-outline-primary">View All Courses</a>
+            </div>
+        </div>
+
+        <!-- Sidebar with quick links -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Quick Links</div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'profile-detail' pk=user.pk %}" class="list-group-item list-group-item-action">My Profile</a>
+                    <a href="{% url 'chat-room-list' %}" class="list-group-item list-group-item-action">Messages</a>
+                    <a href="{% url 'notification-list' %}" class="list-group-item list-group-item-action">
+                        Notifications
+                        {% if unread_notification_count > 0 %}
+                        <span class="badge bg-danger float-end">{{ unread_notification_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'user-search' %}" class="list-group-item list-group-item-action">Search Users</a>
+                    <a href="{% url 'swagger-ui' %}" class="list-group-item list-group-item-action">API Docs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Welcome page for unauthenticated users -->
+    <div class="text-center py-5">
+        <h1>Welcome to eLearning</h1>
+        <p class="lead text-muted">A comprehensive online learning platform for students and teachers.</p>
+        <div class="mt-4">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">Register</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

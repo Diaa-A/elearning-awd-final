@@ -1,0 +1,35 @@
+# Core Django
+Django==5.2.9
+djangorestframework==3.16.1
+django-filter==25.2
+
+# WebSockets (Django Channels)
+channels==4.3.2
+channels-redis==4.3.0
+daphne==4.2.1
+
+# Async task queue
+celery==5.6.2
+redis==7.1.0
+
+# Database
+psycopg2-binary==2.9.11
+
+# File storage (AWS S3 for production)
+django-storages==1.14.6
+boto3==1.42.44
+
+# API documentation (Swagger / OpenAPI)
+drf-yasg==1.21.14
+
+# Image processing (avatar uploads)
+Pillow==11.1.0
+
+# Production WSGI server
+gunicorn==23.0.0
+
+# Environment variable management
+python-dotenv==1.2.1
+
+# Testing and code coverage
+coverage==7.13.3

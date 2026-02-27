@@ -1,0 +1,29 @@
+# systemd service file for Daphne (ASGI WebSocket server).
+#
+# Handles WebSocket connections for real-time chat functionality.
+# Place at: /etc/systemd/system/daphne.service
+#
+# Commands:
+#   sudo systemctl start daphne
+#   sudo systemctl enable daphne
+#   sudo systemctl status daphne
+
+[Unit]
+Description=Daphne ASGI server for eLearning WebSocket support
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/elearning
+EnvironmentFile=/home/ubuntu/elearning/.env
+ExecStart=/home/ubuntu/elearning/venv/bin/daphne \
+    -b 127.0.0.1 \
+    -p 8001 \
+    elearning.asgi:application
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

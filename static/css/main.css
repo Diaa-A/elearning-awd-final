@@ -1,0 +1,48 @@
+/*
+ * Custom styles for the eLearning platform.
+ * Extends Bootstrap 5 with project-specific styling.
+ */
+
+/* Ensure the page fills the full viewport height */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Chat message area styling */
+#chat-messages {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+
+/* Notification badge positioning on the bell icon */
+.nav-link .badge {
+    font-size: 0.65rem;
+}
+
+/* Card hover effect for course cards */
+.card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Profile avatar placeholder */
+.bg-secondary.rounded-circle {
+    border: 3px solid #dee2e6;
+}
+
+/* Unread notification styling */
+.list-group-item-light.fw-bold {
+    border-left: 3px solid #0d6efd;
+}
+
+/* Star rating display in feedback */
+.bi-star-fill, .bi-star {
+    font-size: 0.9rem;
+}
