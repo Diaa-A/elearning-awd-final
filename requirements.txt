@@ -25,6 +25,9 @@ drf-yasg==1.21.14
 # Image processing (avatar uploads)
 Pillow==11.1.0
 
+# Static file serving in production
+whitenoise==6.9.0
+
 # Production WSGI server
 gunicorn==23.0.0
 
