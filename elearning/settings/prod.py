@@ -76,6 +76,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # AWS_QUERYSTRING_EXPIRE = 3600
 
 # ---------------------------------------------------------------------------
+# CSRF - Trusted origins for form submissions (required in Django 4+)
+# Without this, all POST requests (login, register, etc.) will fail with 403.
+# ---------------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = [
+    f'http://{host.strip()}'
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+
+# ---------------------------------------------------------------------------
 # Security settings for production
 # ---------------------------------------------------------------------------
 SECURE_BROWSER_XSS_FILTER = True
